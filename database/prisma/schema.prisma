@@ -3,9 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
+```
+
+Then in Render → **Environment**, add a second variable:
+```
+DIRECT_URL = postgresql://postgres.arigqqojlcwatujopzps:beathubdatabase6766@db.arigqqojlcwatujopzps.supabase.co:5432/postgres
 
 // Minimal dummy model to ensure Prisma generates the client correctly.
 // We will replace this in the next steps when building Auth/Rooms.
