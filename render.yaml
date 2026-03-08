@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: beathub-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build --workspace=@beathub/database && npm run build --workspace=@beathub/backend
+    startCommand: npm run start --workspace=@beathub/backend
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: PORT
+        value: 4000
