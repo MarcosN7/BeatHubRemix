@@ -1,4 +1,3 @@
-// backend/src/app.ts
 import express, { Application } from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health.routes';
@@ -12,9 +11,9 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
