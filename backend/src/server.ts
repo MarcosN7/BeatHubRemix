@@ -5,7 +5,7 @@ import { createServer } from 'http';
 import { initSocketServer } from './socket';
 import { RoomCleanupService } from './services/room-cleanup.service';
 
-const PORT = process.env.PORT || 4000;
+const PORT = Number(process.env.PORT) || 4000;
 const httpServer = createServer(app);
 const io = initSocketServer(httpServer);
 
