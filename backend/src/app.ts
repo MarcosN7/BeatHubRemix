@@ -5,10 +5,14 @@ import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
 import roomRoutes from './routes/room.routes';
 import youtubeRoutes from './routes/youtube.routes';
+import { corsOriginValidator } from './config/cors';
 
 const app: Application = express();
 
-app.use(cors());
+app.use(cors({
+  origin: corsOriginValidator,
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
