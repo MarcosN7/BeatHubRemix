@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "prisma generate && prisma db push"
+    "build": "prisma generate",
+    "db:push": "prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0"
@@ -12,3 +13,8 @@
     "prisma": "^5.10.0"
   }
 }
+```
+
+Then in Render, update your **Start Command** to run `db:push` before starting the server, something like:
+```
+npm run db:push --workspace=@beathub/database && node dist/index.js
