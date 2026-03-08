@@ -1,0 +1,7 @@
+# Backend specific
+node_modules/
+dist/
+.env
+
+# Prisma types
+src/generated/

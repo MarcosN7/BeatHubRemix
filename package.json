@@ -1,0 +1,11 @@
+{
+  "name": "beathub-monorepo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "database"
+  ],
+  "dependencies": {
+    "ioredis": "^5.10.0"
+  }
+}

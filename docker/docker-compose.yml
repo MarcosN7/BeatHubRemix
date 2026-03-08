@@ -1,0 +1,66 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: beathub_postgres
+    environment:
+      POSTGRES_USER: beathub_user
+      POSTGRES_PASSWORD: beathub_password
+      POSTGRES_DB: beathub_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - beathub_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: beathub_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - beathub_network
+
+  backend:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: beathub_backend
+    environment:
+      - DATABASE_URL=postgresql://beathub_user:beathub_password@postgres:5432/beathub_db?schema=public
+      - REDIS_URL=redis://redis:6379
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - beathub_network
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: beathub_frontend
+    environment:
+      - VITE_API_URL=http://localhost:4000/api
+      - VITE_SOCKET_URL=http://localhost:4000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - beathub_network
+
+volumes:
+  pgdata:
+  redisdata:
+
+
+networks:
+  beathub_network:
+    driver: bridge

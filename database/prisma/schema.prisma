@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Minimal dummy model to ensure Prisma generates the client correctly.
+// We will replace this in the next steps when building Auth/Rooms.
+model HealthCheck {
+  id        String   @id @default(uuid())
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String
+  email        String   @unique
+  passwordHash String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  hostedRooms        Room[]   @relation("HostedRooms")
+  roomParticipations RoomParticipant[]
+  queuedSongs        QueueItem[] @relation("UserQueuedSongs")
+  roomBans           RoomBan[]   @relation("UserRoomBans")
+  skipVotes          SkipVote[]  @relation("UserSkipVotes")
+  passwordResetTokens PasswordResetToken[] @relation("UserPasswordResetTokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation("UserPasswordResetTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+enum RoomRole {
+  HOST
+  ADMIN
+  USER
+}
+
+model RoomParticipant {
+  id        String   @id @default(uuid())
+  userId    String
+  roomId    String
+  role      RoomRole @default(USER)
+  joinedAt  DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+}
+
+model Room {
+  id           String   @id @default(uuid())
+  name         String
+  hostId       String
+  isPublic     Boolean  @default(true)
+  host         User     @relation("HostedRooms", fields: [hostId], references: [id])
+  participants RoomParticipant[]
+  queue        QueueItem[] @relation("RoomQueueQueueItems")
+  bans         RoomBan[]   @relation("RoomBans")
+  skipVotes    SkipVote[]  @relation("RoomSkipVotes")
+  history      RoomHistory[]
+  status       String   @default("active") // active, closed
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum QueueItemStatus {
+  queued
+  playing
+  played
+}
+
+model QueueItem {
+  id             String          @id @default(uuid())
+  roomId         String
+  youtubeVideoId String
+  title          String
+  duration       Int
+  addedByUserId  String
+  addedAt        DateTime        @default(now())
+  position       Int
+  status         QueueItemStatus @default(queued)
+
+  room           Room            @relation("RoomQueueQueueItems", fields: [roomId], references: [id], onDelete: Cascade)
+  addedByUser    User            @relation("UserQueuedSongs", fields: [addedByUserId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([addedByUserId])
+  @@index([status])
+  skipVotes      SkipVote[]      @relation("QueueItemSkipVotes")
+}
+
+model RoomBan {
+  id          String   @id @default(uuid())
+  roomId      String
+  userId      String
+  bannedUntil DateTime
+  createdAt   DateTime @default(now())
+
+  room        Room     @relation("RoomBans", fields: [roomId], references: [id], onDelete: Cascade)
+  user        User     @relation("UserRoomBans", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([userId])
+}
+
+model SkipVote {
+  id          String   @id @default(uuid())
+  roomId      String
+  userId      String
+  queueItemId String
+  createdAt   DateTime @default(now())
+
+  room        Room      @relation("RoomSkipVotes", fields: [roomId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserSkipVotes", fields: [userId], references: [id], onDelete: Cascade)
+  queueItem   QueueItem @relation("QueueItemSkipVotes", fields: [queueItemId], references: [id], onDelete: Cascade)
+
+  // A user can only vote skip once per queue item
+  @@unique([userId, queueItemId])
+  @@index([roomId])
+  @@index([queueItemId])
+}
+
+model RoomHistory {
+  id             String   @id @default(uuid())
+  roomId         String
+  youtubeVideoId String
+  title          String
+  addedByUserId  String
+  playedAt       DateTime @default(now())
+
+  room           Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+}
