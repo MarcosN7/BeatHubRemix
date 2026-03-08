@@ -126,6 +126,7 @@ This repo works well with:
 2. Use the provided `render.yaml` blueprint (recommended), or manually set:
    - **Build command:** `npm install && npm run build --workspace=@beathub/database && npm run build --workspace=@beathub/backend`
    - **Start command:** `npm run start --workspace=@beathub/backend`
+   - The database workspace build only runs `prisma generate` (it does not attempt a DB connection during Render build).
 3. Configure env vars in Render:
    - `DATABASE_URL` = Supabase Postgres URL
    - `REDIS_URL` = your Redis instance URL
@@ -134,6 +135,13 @@ This repo works well with:
    - `YOUTUBE_API_KEY` = YouTube Data API key
    - `RESEND_API_KEY` = Resend key (if using email flows)
    - `PORT` = `4000`
+
+### 2.1 Apply schema to Supabase
+After first deploy (or schema changes), run Prisma push from a shell where `DATABASE_URL` points to Supabase:
+
+```bash
+npm run db:push --workspace=@beathub/database
+```
 
 ### 3. Configure frontend on Vercel
 In your Vercel project, add:
