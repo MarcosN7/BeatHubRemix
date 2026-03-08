@@ -13,13 +13,4 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`🩺 Health check: http://localhost:${PORT}/api/health`);
   console.log(`⚡ WebSockets initialized`);
-
-  try {
-    const cleanup = RoomCleanupService.getInstance();
-    await cleanup.purgeStaleRooms();
-    cleanup.start(60_000);
-  } catch (err) {
-    console.error('Cleanup service failed to start:', err);
-    // Don't crash the server if cleanup fails
-  }
 });
