@@ -10,7 +10,11 @@ const app: Application = express();
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     const allowed = process.env.FRONTEND_URL?.replace(/\/$/, '');
-    // Allow requests with no origin (mobile apps, curl, Postman)
+
+    // ADD THIS TEMPORARILY
+    console.log('FRONTEND_URL env:', allowed);
+    console.log('Incoming origin:', origin);
+
     if (!origin || origin === allowed) {
       callback(null, true);
     } else {
