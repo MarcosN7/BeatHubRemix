@@ -43,4 +43,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/youtube', youtubeRoutes);
 
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('Unhandled error:', err.message, err.stack);
+  res.status(500).json({ error: err.message });
+});
+
 export default app;
