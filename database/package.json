@@ -13,8 +13,4 @@
     "prisma": "^5.10.0"
   }
 }
-```
 
-Then in Render, update your **Start Command** to run `db:push` before starting the server, something like:
-```
-npm run db:push --workspace=@beathub/database && node dist/index.js
