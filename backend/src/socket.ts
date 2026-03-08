@@ -2,6 +2,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import jwt from 'jsonwebtoken';
 import { registerRoomHandlers } from './socket-handlers/room-events.handler';
+import { allowedOrigins } from './config/cors';
 
 // Extend the Socket type to carry the authenticated userId
 export interface AuthenticatedSocket extends Socket {
@@ -13,7 +14,7 @@ let io: SocketIOServer;
 export const initSocketServer = (server: HttpServer) => {
     io = new SocketIOServer(server, {
         cors: {
-            origin: '*', // For development. Map to frontend URL in production.
+            origin: allowedOrigins,
             methods: ['GET', 'POST']
         }
     });

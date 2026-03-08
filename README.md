@@ -106,6 +106,56 @@ npm run dev
 
 ---
 
+## ☁️ Deployment (Vercel + Render + Supabase)
+
+This repo works well with:
+- **Frontend:** Vercel
+- **Backend:** Render (Web Service)
+- **Database:** Supabase (PostgreSQL)
+
+### 1. Create Supabase database
+1. Create a Supabase project.
+2. Go to **Project Settings → Database** and copy the connection string.
+3. Use the **Direct connection** URL for `DATABASE_URL` on Render.
+
+> Tip: Prisma needs a standard Postgres connection string, for example:
+> `postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres?schema=public`
+
+### 2. Deploy backend on Render
+1. In Render, create a **Web Service** from this repository.
+2. Use the provided `render.yaml` blueprint (recommended), or manually set:
+   - **Build command:** `npm install && npm run build --workspace=@beathub/database && npm run build --workspace=@beathub/backend`
+   - **Start command:** `npm run start --workspace=@beathub/backend`
+3. Configure env vars in Render:
+   - `DATABASE_URL` = Supabase Postgres URL
+   - `REDIS_URL` = your Redis instance URL
+   - `JWT_SECRET` = strong random secret
+   - `FRONTEND_URL` = your Vercel URL(s), comma-separated if multiple
+   - `YOUTUBE_API_KEY` = YouTube Data API key
+   - `RESEND_API_KEY` = Resend key (if using email flows)
+   - `PORT` = `4000`
+
+### 3. Configure frontend on Vercel
+In your Vercel project, add:
+
+```env
+VITE_API_URL="https://<your-render-service>.onrender.com/api"
+VITE_SOCKET_URL="https://<your-render-service>.onrender.com"
+```
+
+Redeploy the frontend after adding/changing env vars.
+
+### 4. CORS and sockets
+Set `FRONTEND_URL` on Render to your Vercel origin(s). Multiple origins are supported via comma-separated values, for example:
+
+```env
+FRONTEND_URL="https://beathubremix.vercel.app,https://beathubremix-git-main-yourteam.vercel.app"
+```
+
+This value is used by both Express CORS and Socket.io CORS.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
