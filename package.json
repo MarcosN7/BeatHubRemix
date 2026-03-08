@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "backend",
-    "database"
+    "database",
+    "frontend"
   ],
   "dependencies": {
     "ioredis": "^5.10.0"
